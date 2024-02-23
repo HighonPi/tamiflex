@@ -18,8 +18,8 @@
     	<mkdir dir="bin-agent"/>
         <javac
             destdir="bin-agent"
-        	source="1.5"
-        	target="1.5"
+        	source="1.8"
+        	target="1.8"
         	debug="true"
 			debuglevel="lines,vars,source"        	
         >
@@ -32,6 +32,7 @@
                 <pathelement location="../Normalizer/lib/asm-3.2.jar"/>
                 <pathelement location="../Normalizer/lib/asm-commons-3.2.jar"/>
             </classpath>
+          <compilerarg value="-Xlint:deprecation" />
         </javac>
     </target>
 

@@ -3,7 +3,7 @@ MonitorAgent/bin
 Normalizer/bin
 PlayInAgent/bin
 PlayOutAgent/bin
-PlayOutAgent
+# PlayOutAgent
 ReportingAgent/bin
 TamiFlexDatabase/bin
 Booster/bin
