@@ -15,7 +15,8 @@
 	<target name="default" depends="copy-agent-jar"/>
 
 	<target name="agent">
-    	<mkdir dir="bin-agent"/>
+    	<echo message="Using Java version ${ant.java.version}."/>
+      <mkdir dir="bin-agent"/>
         <javac
             destdir="bin-agent"
         	source="1.8"
@@ -29,8 +30,8 @@
             <classpath>
                 <pathelement location="poa-rt.jar"/>
                 <pathelement location="lib/ant.jar"/>
-                <pathelement location="../Normalizer/lib/asm-3.2.jar"/>
-                <pathelement location="../Normalizer/lib/asm-commons-3.2.jar"/>
+                <pathelement location="../Normalizer/lib/asm-9.7.jar"/>
+                <pathelement location="../Normalizer/lib/asm-commons-9.7.jar"/>
             </classpath>
           <compilerarg value="-Xlint:deprecation" />
         </javac>
@@ -49,8 +50,8 @@
         <jar destfile="poa-${tf.version}.jar" manifest="META-INF/MANIFEST.MF">
             <fileset dir="bin-agent"/>
             <fileset file="poa.properties"/>
-            <zipfileset src="../Normalizer/lib/asm-3.2.jar"/>
-            <zipfileset src="../Normalizer/lib/asm-commons-3.2.jar"/>
+            <zipfileset src="../Normalizer/lib/asm-9.7.jar"/>
+            <zipfileset src="../Normalizer/lib/asm-commons-9.7.jar"/>
         </jar>
 		<delete dir="bin-agent"/>
 		<delete dir="META-INF"/>

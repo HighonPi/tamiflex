@@ -98,13 +98,17 @@ public class Agent {
 		
 		final File logFile = new File(outDir,"refl.log");
 		
+		// For dumping classes which have already been loaded
 		dumpLoadedClasses(inst,outDir,dontDump,verbose);
 		
+		// All reflection calls to be monitored are sent to this class
 		ReflLogger.setLogFile(logFile);
 		
+		// For logging reflection calls made by the program under observation
 		if(!transformations.isEmpty())
 			instrumentClassesForLogging(inst);
 		
+		// For dumping classes which will be loaded down the line
 		inst.addTransformer(classDumper, CAN_RETRANSFORM);
 		
 		final boolean verboseOutput = verbose;
@@ -123,10 +127,11 @@ public class Agent {
 				classDumper.writeClassesToDisk();
 				ReflLogger.writeLogfileToDisk(verboseOutput,classDumper.newClasses);
 				
+				// If DB jar exists, log file is dumped to the database
 				String agentJarDir = agentJarFilePath.substring(0, agentJarFilePath.lastIndexOf('/'));
 				String version = Agent.class.getPackage().getImplementationVersion();
 				String dbJarPath = agentJarDir+'/'+"dbdumper-"+version+".jar";
-				
+								
 				try {
 					File jarfile = new File(new URI(dbJarPath));
 					if(jarfile.exists()) {
@@ -222,9 +227,15 @@ public class Agent {
 		//dump all classes that are already loaded
 		for (Class<?> c : inst.getAllLoadedClasses()) {
 			if(inst.isModifiableClass(c)) {
+				// java.lang.instrument API supports re-transforming classes which have been loaded already 
 				inst.retransformClasses(c);
 			} else {
 				if(!c.isPrimitive() && !c.isArray() && (c.getPackage()==null || !c.getPackage().getName().startsWith("java.lang"))){
+//					if (c.getName().contains("$$Lambda$")) {
+//						System.out.println("Voluntarily ignoring/not-dumping the lambda generated class: " + c.getName());
+//						continue;
+//					}
+					
 					System.err.println("WARNING: Cannot dump class "+c.getName());
 				}
 			}
@@ -237,6 +248,7 @@ public class Agent {
 		inst.addTransformer(reflMonitor, CAN_RETRANSFORM);
 		
 		List<Class<?>> affectedClasses = reflMonitor.getAffectedClasses();
+		// java.lang.instrument API supports re-transforming classes which have been loaded already
 		inst.retransformClasses(affectedClasses.toArray(new Class<?>[affectedClasses.size()]));
 		
 		inst.removeTransformer(reflMonitor);
