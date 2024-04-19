@@ -82,7 +82,8 @@ public class ReflectionMonitor implements ClassFileTransformer {
 			
 			// Use COMPUTE_FRAMES flag to automatically compute both Size(of Operand stack and 
 			// Local variables) and Stack map frames. See section 3.2.1 of ASM documentation
-			final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+            // Passing `creader` for optimizing ASM performance (See Section 2.2.4 subsection Optimization of ASM documentation)
+			final ClassWriter writer = new ClassWriter(creader, ClassWriter.COMPUTE_FRAMES);
 			ClassVisitor visitor = writer;
 			
 			for (AbstractTransformation transformation : transformations)
