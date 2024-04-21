@@ -55,17 +55,25 @@ public class Agent {
 		
 		System.out.println("=======================================================");
 
+        // Transform already loaded classes
 		for (Class<?> c : inst.getAllLoadedClasses()) {
-			if(inst.isModifiableClass(c)) {
+			if (inst.isModifiableClass(c)) {
 				inst.retransformClasses(c);
 			} else if(verbose) {
-				//warn if there is a class that we cannot re-transform, except for classes that resemble primitive types,
-				//arrays or are in java.lang
-				if(!c.isPrimitive() && !c.isArray() && (c.getPackage()==null || !c.getPackage().getName().startsWith("java.lang"))){
-					System.out.println("WARNING: Cannot replace class "+c.getName());
+				// (In order) Cannot modify Primitive classes, Arrays, classes loaded by the bootstrap class loader, Core Java classes
+                // Other than those on encountering an unmodifiable class send a warning
+				if (!c.isPrimitive() && !c.isArray() && (c.getPackage()==null || !c.getPackage().getName().startsWith("java.lang"))){
+                    // Cannot modify some synthetic classes too
+                    if (c.isSynthetic()) {
+                        System.err.println("WARNING: Cannot replace (unmodifiable) SYNTHETIC class "+c.getName());
+                    } else {
+                        System.err.println("WARNING: Cannot replace (unmodifiable) NON-SYNTHETIC class "+c.getName());
+                    }
 				}
 			}
 		}
+
+        // Classes loaded further down the line will be modified via ClassReplacer's transform() method
 	}
 	
 	private static void loadProperties() {

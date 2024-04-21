@@ -226,17 +226,19 @@ public class Agent {
 		inst.addTransformer(classDumper, CAN_RETRANSFORM);
 		//dump all classes that are already loaded
 		for (Class<?> c : inst.getAllLoadedClasses()) {
-			if(inst.isModifiableClass(c)) {
+			if (inst.isModifiableClass(c)) {
 				// java.lang.instrument API supports re-transforming classes which have been loaded already 
 				inst.retransformClasses(c);
 			} else {
-				if(!c.isPrimitive() && !c.isArray() && (c.getPackage()==null || !c.getPackage().getName().startsWith("java.lang"))){
-//					if (c.getName().contains("$$Lambda$")) {
-//						System.out.println("Voluntarily ignoring/not-dumping the lambda generated class: " + c.getName());
-//						continue;
-//					}
-					
-					System.err.println("WARNING: Cannot dump class "+c.getName());
+                // (In order) Cannot modify Primitive classes, Arrays, classes loaded by the bootstrap class loader, Core Java classes
+                // Other than those on encountering an unmodifiable class send a warning
+				if (!c.isPrimitive() && !c.isArray() && (c.getPackage()==null || !c.getPackage().getName().startsWith("java.lang"))) {
+                    // Cannot modify some synthetic classes too
+                    if (c.isSynthetic()) {
+                        System.err.println("WARNING: Cannot dump (unmodifiable) SYNTHETIC class "+c.getName());
+                    } else {
+                        System.err.println("WARNING: Cannot dump (unmodifiable) NON-SYNTHETIC class "+c.getName());
+                    }
 				}
 			}
 		}
