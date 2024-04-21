@@ -211,11 +211,14 @@ public class ReflLogger {
 			leavingReflectionAPI();
 			return;		
 		}
-				
+		
+        // Look at POA/transformation/method/* for clear understanding, only when the reflection call made is
+        // Kind.MethodInvoke for a non-static method is the "receiver" field not null and it makes sense to log
+        // the accurate receiver class
 		Class<?> receiverClass = methodKind!=Kind.MethodInvoke || Modifier.isStatic(m.getModifiers())
 		  ? m.getDeclaringClass() : receiver.getClass();
 		try {
-			//resolve virtual call
+			// Resolve virtual call to find out the class which defines the method "m"
 			Method resolved = null;
 			Class<?> c = receiverClass;
 			do {

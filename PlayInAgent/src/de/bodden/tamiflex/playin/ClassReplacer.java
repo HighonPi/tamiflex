@@ -9,7 +9,7 @@
  *     Eric Bodden - initial API and implementation
  ******************************************************************************/
 package de.bodden.tamiflex.playin;
-import static de.bodden.tamiflex.normalizer.Hasher.containsGeneratedClassName;
+import static de.bodden.tamiflex.normalizer.Hasher.isGeneratedClass;
 import static de.bodden.tamiflex.normalizer.ReferencedGeneratedClasses.nameOfGeneratedClassReferenced;
 
 import java.io.ByteArrayOutputStream;
@@ -43,7 +43,7 @@ public class ClassReplacer implements ClassFileTransformer {
 
 	/** A mapping from class names of generated classes to the original class bytes of the respective class, i.e.,
 	 *  the bytes as they were just about to be loaded on the current execution.
-	 *  See {@link Hasher#containsGeneratedClassName(String)} to determine if a class is generated in this sense.
+	 *  See {@link Hasher#isGeneratedClass(String)} to determine if a class is generated in this sense.
 	 */
 	protected Map<String,byte[]> generatedClassNameToOriginalBytes = new HashMap<String, byte[]>();
 	
@@ -60,7 +60,7 @@ public class ClassReplacer implements ClassFileTransformer {
 			className = NameExtractor.extractName(classfileBuffer);
 		}
 		try{
-			if(containsGeneratedClassName(className))
+			if(isGeneratedClass(className))
 				storeClassBytesOfGeneratedClass(className, classfileBuffer);			
 			return tryToReplaceClassBytes(className);
 		} catch (RuntimeException e) {
@@ -83,7 +83,7 @@ public class ClassReplacer implements ClassFileTransformer {
 			byte[] originalBytes;
 			synchronized(this) {
 				originalBytes = generatedClassNameToOriginalBytes.get(className);
-				isGeneratedClass = Hasher.containsGeneratedClassName(className);
+				isGeneratedClass = Hasher.isGeneratedClass(className);
 				if(isGeneratedClass) {
 					byte[] originalClassBytes = originalBytes;
 					

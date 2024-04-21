@@ -14,12 +14,18 @@ import org.objectweb.asm.commons.Remapper;
 
 /**
  * A {@link Remapper} that not only re-maps type names but also string
- * constants.
+ * constants. 
+ * 
+ * Remapping String constants is necessary because reflective calls for 
+ * example can be of the following form:
+ * Class<?> clazz = Class.forName("path.to.the.classfile");
+ * In such a case if the string refers to generated class then it also 
+ * needs to be updated for ensuring correctness of the transformation
  */
 public class StringRemapper extends Remapper {
 	
 	public String remapStringConstant(String constant) {
-		//by default, don't re-map anything
+		// By default, don't re-map anything
 		return constant;
 	}
 

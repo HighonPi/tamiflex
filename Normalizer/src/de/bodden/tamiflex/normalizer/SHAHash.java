@@ -20,7 +20,7 @@ public class SHAHash {
 	    MessageDigest md;
 	    try {
 			md = MessageDigest.getInstance("SHA-1");
-			byte[] sha1hash = new byte[40];
+			byte[] sha1hash = new byte[40]; // Check if size of 20 (40 hexadecimal digits / 2 digits per byte) suffices
 			md.update(bytes, 0, bytes.length);
 			sha1hash = md.digest();
 			return convertToHex(sha1hash);

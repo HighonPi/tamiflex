@@ -13,7 +13,7 @@
  */
 package de.bodden.tamiflex.normalizer;
 
-import static de.bodden.tamiflex.normalizer.Hasher.containsGeneratedClassName;
+import static de.bodden.tamiflex.normalizer.Hasher.isGeneratedClass;
 import static de.bodden.tamiflex.normalizer.Hasher.slashed;
 
 import java.util.Set;
@@ -34,7 +34,7 @@ public final class ReferencedClassesExtracter extends
 		super(cv, new Remapper() {
     		@Override
     		public String map(String typeName) {
-    			if(containsGeneratedClassName(typeName))
+    			if(isGeneratedClass(typeName))
     				res.add(typeName);
    				return super.map(typeName);
     		}
@@ -50,7 +50,7 @@ public final class ReferencedClassesExtracter extends
 			@Override
 			public String remapStringConstant(String constant) {
 				String slashed = slashed(constant);
-				if(containsGeneratedClassName(slashed))
+				if(isGeneratedClass(slashed))
 					res.add(slashed);
 				return super.remapStringConstant(constant);
 			}

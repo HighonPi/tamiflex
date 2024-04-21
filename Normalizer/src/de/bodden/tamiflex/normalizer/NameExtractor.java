@@ -25,7 +25,7 @@ public class NameExtractor {
 		
 		cr.accept(new ClassVisitor(Opcodes.ASM9) {
 			// ClassVisitor is an abstract class with no abstract methods
-			// Therefore this subclass is essentially an empty visitor
+			// Therefore this subclass is essentially an empty visitor (as it does not delegate calls to any further ClassVisitor)
 			@Override
 			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
 				className[0] = name;

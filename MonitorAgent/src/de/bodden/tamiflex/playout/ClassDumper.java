@@ -10,7 +10,7 @@
  ******************************************************************************/
 package de.bodden.tamiflex.playout;
 
-import static de.bodden.tamiflex.normalizer.Hasher.containsGeneratedClassName;
+import static de.bodden.tamiflex.normalizer.Hasher.isGeneratedClass;
 import static de.bodden.tamiflex.normalizer.Hasher.generateHashNumber;
 import static de.bodden.tamiflex.normalizer.Hasher.hashedClassNameForGeneratedClassName;
 import static de.bodden.tamiflex.normalizer.Hasher.replaceGeneratedClassNamesByHashedNames;
@@ -73,7 +73,7 @@ public class ClassDumper implements ClassFileTransformer {
 				String className = entry.getKey();
 				byte[] classfileBuffer = entry.getValue();
 		
-				if(containsGeneratedClassName(className)) {
+				if(isGeneratedClass(className)) {
 					generateHashNumber(className, classfileBuffer);
 					className = hashedClassNameForGeneratedClassName(className);
 					classfileBuffer = replaceGeneratedClassNamesByHashedNames(classfileBuffer);

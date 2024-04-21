@@ -10,7 +10,7 @@
  ******************************************************************************/
 package de.bodden.tamiflex.playout;
 
-import static de.bodden.tamiflex.normalizer.Hasher.containsGeneratedClassName;
+import static de.bodden.tamiflex.normalizer.Hasher.isGeneratedClass;
 import static de.bodden.tamiflex.normalizer.Hasher.generateHashNumber;
 import static de.bodden.tamiflex.normalizer.Hasher.hashedClassNameForGeneratedClassName;
 import static de.bodden.tamiflex.normalizer.Hasher.replaceGeneratedClassNamesByHashedNames;
@@ -62,31 +62,37 @@ public class ClassDumper implements ClassFileTransformer {
 		if(className.startsWith(Agent.PKGNAME)) return null;
 		
 		byte[] oldBytes;
+
+        // Synchronization is necessary as a single static instance of ClassDumper is maintained in Agent.java
+        // This instance is passed for class file transformations(which could occur in multiple threads simultaneously)
 		synchronized (this) {
 			oldBytes = classNameToBytes.put(className, classfileBuffer);
 		}
 
-		if(verbose && oldBytes!=null && !Arrays.equals(classfileBuffer, oldBytes)) {
+		if(oldBytes!=null && !Arrays.equals(classfileBuffer, oldBytes)) {
 			System.err.println("WARNING: There exist two different classes with name "+className);
 		}
 
+        // We are only interested in reading the class file, no intention of modifying them
 		return null;
 	}
 	
 	public void writeClassesToDisk() {
+        // Synchronization is necessary as the static instance of ClassDumper in Agent.java calls writeClassesToDisk() as part
+        // of it's shutdown hook, which could(I think not) run parallely with any call to transform() which can modify classNameToBytes
 		synchronized (this) {
 			Set<Entry<String, byte[]>> entrySet = classNameToBytes.entrySet();
 			for (Map.Entry<String, byte[]> entry: entrySet) {
 				String className = entry.getKey();
 				byte[] classfileBuffer = entry.getValue();
 		
-				if(containsGeneratedClassName(className)) {
+				if (isGeneratedClass(className)) {
 					generateHashNumber(className, classfileBuffer);
 					className = hashedClassNameForGeneratedClassName(className);
 					classfileBuffer = replaceGeneratedClassNamesByHashedNames(classfileBuffer);
 				}
 	
-				if(dontReallyDump) continue; //don't dump
+				if (dontReallyDump) continue; //don't dump
 				
 				File localOutDir = outDir;
 				
